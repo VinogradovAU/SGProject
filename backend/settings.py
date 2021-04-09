@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'hub',
     'authapp',
     'post',
+    'tinymce',
 ]
 
 MIDDLEWARE = [

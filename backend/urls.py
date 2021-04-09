@@ -18,15 +18,18 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-import hub.views as hub
 
 urlpatterns = [
     path('', include('hub.urls', namespace='hub')),
     path('admin/', admin.site.urls),
     path('', include('authapp.urls', namespace='authapp')),
-    path('post/', include('post.urls', namespace='post'))
+    path('post/', include('post.urls', namespace='post')),
+    path('tinymce/', include('tinymce.urls')),
 ]
 
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+

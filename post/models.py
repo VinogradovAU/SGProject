@@ -2,6 +2,8 @@ from django.db import models
 from authapp.models import HubUser, HubUserProfile
 from hub.models import HubCategory, Hub
 
+from tinymce.models import HTMLField
+
 # Create your models here.
 
 NULLABLE = {'blank': True, 'null': True}

@@ -21,6 +21,12 @@ class HubUserRegisterForm(UserCreationForm):
     password2 = forms.CharField(max_length=16, widget=forms.PasswordInput(
         attrs={'placeholder': 'Пароль еще раз'}))
 
+    email = forms.CharField(max_length=100, required=True)
+
+    widgets = {
+        'email': forms.EmailInput(attrs={'required': True})
+    }
+
     class Meta:
         model = HubUser
         fields = ('username', 'password1', 'password2', 'email')

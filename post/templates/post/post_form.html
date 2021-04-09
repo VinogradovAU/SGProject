@@ -1,0 +1,37 @@
+{% extends 'hub/base.html' %}
+{% load static %}
+{% block content %}
+    <div class="posts">
+
+        <div class="card">
+
+            <img src="https://media.istockphoto.com/vectors/thin-line-design-concept-for-project-website-banner-vector-id510855044"
+                 alt="preview">
+            <div class="post__container">
+                    <form id="form-horizontal m-t-30" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+
+                        <div class="form-button">
+                            <button id="submit" type="submit"
+                                    class="btn btn-primary w-md waves-effect waves-light">Сохранить
+                            </button>
+                        </div>
+
+                    </form>
+{#                <div class="post__user">Пользователь: <span>{{ post.user_id }}</span></div>#}
+{#                <div class="post__date">Дата публицкации: <span>{{ post.updated_at }}</span></div>#}
+{#                <div class="post__title"><h3>{{ post.name }}</h3></div>#}
+{#                <div class="post__body">#}
+{#                    <p>#}
+{#                        {{ post.post_text }}#}
+{#                    </p>#}
+{##}
+{#                </div>#}
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock %}

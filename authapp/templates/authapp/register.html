@@ -1,15 +1,24 @@
 {% extends 'hub/base.html' %}
 {% load static %}
 {% block content %}
-    <div class="card">
-        <div class="user__login">
-            <form id="signinform" action="{% url 'authapp:register' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
+    <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+        <main class="form-signin mt-5">
+  <form id="form-control" action="{% url 'authapp:register' %}" method="post" enctype="multipart/form-data">
+   {% csrf_token %}
+                    {% if next %}
+                        <input type="hidden" name="next" value="{{ next }}">
+                    {% endif %}
                 {{ form.as_p }}
-                <div class="form-button">
-                    <button id="submit" type="submit" class="ybtn ybtn-reg ybtn-accent-color">Зарегистрироваться</button>
-                </div>
-            </form>
-        </div>
+
+    <button class="w-100 btn btn-lg btn-primary" type="submit">Зарегистрироваться</button>
+
+  </form>
+</main>
     </div>
+    <div class="col-3"></div>
+</div>
+
+
 {% endblock %}

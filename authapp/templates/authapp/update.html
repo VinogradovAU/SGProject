@@ -2,20 +2,25 @@
 {% load static %}
 {% block content %}
 
-    <div class="card">
-        <div class="user__login">
-            <form id="signinform" action="{% url 'authapp:update' %}" method="post" enctype="multipart/form-data">
+    <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6">
+        <main class="form-signin mt-5">
+            <form id="formcontrol" action="{% url 'authapp:update' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {{ update_form.as_p }}
                 {{ profile_form.as_p }}
                 <div class="form-button">
-                    <button id="submit" type="submit" class="ybtn ybtn-reg ybtn-accent-color">Сохранить</button>
+                    <button id="submit" type="submit" class="w-100 btn btn-lg btn-primary">Сохранить</button>
                 </div>
             </form>
-            <div class="social">
-                <div class="social__link"><a href="https://google.com" target="_blank"><i class="fa fa-google fa-3x"></i></a></div>
-                <div class="social__link"><a href="https://github.com" target="_blank"><i class="fa fa-github-alt fa-3x"></i></a></div>
-            </div>
+            <div class="row">
+        <div class="col text-center">
+                <a href="https://google.com" target="_blank"><i class="fa fa-google fa-3x"></i></a>
+                <a href="https://github.com" target="_blank"><i class="fa fa-github-alt fa-3x"></i></a>
+        </div>
+    </div>
+        </main>
         </div>
     </div>
 

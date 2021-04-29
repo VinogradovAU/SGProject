@@ -2,37 +2,58 @@
 {% load static %}
 {% block content %}
 
-        <table id="datatable" class="table table-striped dt-responsive nowrap table-vertical"
-                           width="100%" cellspacing="0">
+    <div class="row">
+
+        <div class="col">
+
+            <table id="datatable" class="table table-hover">
                         <thead>
                         <tr>
                             <th>Никнейм</th>
                             <th>Забанен</th>
-                            <th>Заданен до</th>
+                            <th>Забанен до</th>
                             <th>Действия</th>
+                            <th></th>
                         </tr>
                         </thead>
                         <tbody>
                         {% for user in users %}
                             <tr>
-                                <td>{{ user.username }}</td>
+                                <td id="username-{{ forloop.counter }}">{{ user.username }}</td>
                                 <td>{{ user.get_banned_display }}</td>
-                                {% if user.banned_to is not None %}
-                                <td>{{ user.banned_to }}</td>
-                                {% endif %}
-                                <td>
 
+                            {% if user.banned_to is not None %}
+                                <td>{{ user.banned_to }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+
+                                <td>
+                                    {% if user.banned_to %}
+                                        <a href="#" id="link-{{ forloop.counter }}" class="btn btn-success link">разбанить</a>
+                                    {% else %}
+                                        <a href="#" id="link-{{ forloop.counter }}" class="btn btn-danger link">забанить</a>
+                                    {% endif %}
                                 </td>
                                 <td>
-{#                                    <a href="{% url 'adminapp:contract_update' object.pk %}"#}
-{#                                       class="m-r-15 text-muted"#}
-{#                                       data-toggle="tooltip" data-placement="top" title=""#}
-{#                                       data-original-title="Редактировать"><i class="mdi mdi-pencil font-18"></i></a>#}
-{#                                    <a href="{% url 'adminapp:contract_delete' object.pk %}" class="text-muted"#}
-{#                                       data-toggle="tooltip"#}
-{#                                       data-placement="top" title="" data-original-title="Удалить"><i#}
-{#                                            class="mdi mdi-close font-18"></i></a>#}
+                                <form action="{% url 'adminapp:user_ban' user.id %}" method="post" class="form" id="form-{{ forloop.counter }}" style="display: none;">
+                                    {% csrf_token %}
+                                    {{ form.media }}
+                                    {{ form.as_p }}
+
+                                    <div class="form-button">
+                            <button id="submit" type="submit"
+                                    class="btn btn-success">подтвердить
+                            </button>
+                        </div>
+                                </form>
                                 </td>
+                            <td>
+
+                                <a href="{% url 'adminapp:user_ban' user.id %}" style="display: none;"
+                                   id="submit-{{ forloop.counter }}" class="btn btn-success">подтвердить</a>
+
+                            </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -65,5 +86,11 @@
                         </ul>
                     </nav>
     {% endif %}
+
+        </div>
+
+    </div>
+
+
 
 {% endblock %}

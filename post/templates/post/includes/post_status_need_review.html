@@ -1,16 +1,18 @@
 {% load static %}
 {% block post_status_template %}
 
-                                <a href="{% url 'post:post_update' post.id %}">
-                                    <button>Редактировать</button>
+                                <a href="{% url 'post:post_update' post.id %}" class="btn btn-primary">
+                                    Редактировать
                                 </a>
 
-                                <a href="{% url 'post:post_moderate' post.id %}">
-                                    <button>Оправить на модерацию</button>
+                                {% if user.banned == 'active' %}
+                                <a href="{% url 'post:post_moderate' post.id %}" class="btn btn-primary">
+                                    Оправить на модерацию
                                 </a>
+                                {% endif %}
 
-                                <a href="{% url 'post:post_archive' post.id %}">
-                                    <button>Удалить</button>
+                                <a href="{% url 'post:post_archive' post.id %}" class="btn btn-primary">
+                                    Удалить
                                 </a>
 
 {% endblock %}

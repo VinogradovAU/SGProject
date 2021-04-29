@@ -1,9 +1,10 @@
 {% load static %}
 {% block post_on_moderate %}
-
-                                    <a href="{% url 'post:post_moderating' post.id %}">
-                                    <button>Модерировать</button>
+                                    {% if user.banned == 'active' %}
+                                    <a href="{% url 'post:post_moderating' post.id %}" class="btn btn-primary">
+                                    Модерировать
                                     </a>
+                                    {% endif %}
 
 {#                                <a href="{% url 'post:post_moderate_done' post.id %}">#}
 {#                                    <button>Модерация пройдена</button>#}

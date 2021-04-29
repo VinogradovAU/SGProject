@@ -8,13 +8,13 @@
 {% load static %}
 
 {% block content %}
-    <div class="posts">
+    <div class="card mt-3">
 
-        <div class="card">
+        <div class="card-body">
 
             <img src="https://media.istockphoto.com/vectors/thin-line-design-concept-for-project-website-banner-vector-id510855044"
-                 alt="preview">
-            <div class="post__container">
+                 class="card-img-top" alt="...">
+
             {% include 'post/includes/post_moderate_status.html' %}
                 <div class="post__user">Пользователь: <span>{{ post.user }}</span></div>
                 <div class="post__date">Дата публицкации: <span>{{ post.updated_at }}</span></div>
@@ -45,6 +45,7 @@
                     <div class="post__karma"><i class="fa fa-bar-chart" aria-hidden="true"></i>
                         <span class="post__karma__count">{{ post.post_karma }}</span>&nbsp;
                         <span class="post__karma__msg"></span>&nbsp;
+                    {% if post.status == 'published' %}
                         {% if request.user.is_authenticated %}
                             {% if request.user == post.post_id.first.user %}
                                 {% if post.post_id.first.karma == 1 %}
@@ -75,11 +76,14 @@
                         {% else %}
                             <span>Для выставления оценки авторизуйтесь.</span>
                         {% endif %}
+                    {% endif %}
                     </div>
                 </div>
-            </div>
+
         </div>
     </div>
+
+{% if user.banned == 'active' %}
     <h2>Комментарии</h2>
 
     {% for comment in comments %}
@@ -151,6 +155,7 @@
             </div>
         </div>
     {% endfor %}
+    {% if post.status == 'published' %}
     {% if form %}
         <h3 id="write_comment"><a style="color: black;" onclick="return show_comments_form('write_comment')">Написать
             комментарий</a></h3>
@@ -172,5 +177,8 @@
             </div>
         </div>
     {% endif %}
+    {% endif %}
+    {% endif %}
+
 {% endblock %}
 

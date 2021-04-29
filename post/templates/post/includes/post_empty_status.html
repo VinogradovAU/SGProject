@@ -1,5 +1,7 @@
 {% load static %}
 {% block post_empty_status %}
+
+
                                 {% if not posts and request.GET.status == 'unpublished'%}
                                     <h1>Неопубликованных постов нет</h1>
                                 {% endif %}

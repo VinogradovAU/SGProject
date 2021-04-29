@@ -88,7 +88,6 @@ class Post(models.Model):
     def clean_tags(self):
         Post.objects.get(id=self.id).clean()
 
-
     def get_all_tags(self):
         res = ''
         all_tags = Post.objects.get(id=self.id).tags.all()

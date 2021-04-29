@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import pytz
 from django.contrib import auth, messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, Count, F
@@ -35,28 +35,33 @@ def perform_karma_update(post, user, karma):
     :param karma: оценка, может быть 1 или -1
     :return:
     """
-    already_liked = PostKarma.objects.filter(Q(user=user.id) & Q(post=post.id))
+    if user.banned != 'active':
+        return JsonResponse({'result': 'Действие недоступно для забаненных пользователей'})
 
-    if user.id == post.user.id:
-
-        resp = 'Нельзя оценивать свой собственный пост!'
-        return JsonResponse({'result': resp})
-    elif not already_liked:
-        new_object = PostKarma.objects.create(post=post, user=user, karma=karma)
-        new_object.save()
-        post.karma_count = F('karma_count') + karma
-        post.save()
-        updated_post_karma = Post.objects.filter(id=post.id).first().post_karma
-        return JsonResponse({'result': str(updated_post_karma)})
     else:
-        already_liked.delete()
-        if post.karma_count >= 0:
-            post.karma_count = F('karma_count') - 1
+
+        already_liked = PostKarma.objects.filter(Q(user=user.id) & Q(post=post.id))
+
+        if user.id == post.user.id:
+
+            resp = 'Нельзя оценивать свой собственный пост!'
+            return JsonResponse({'result': resp})
+        elif not already_liked:
+            new_object = PostKarma.objects.create(post=post, user=user, karma=karma)
+            new_object.save()
+            post.karma_count = F('karma_count') + karma
+            post.save()
+            updated_post_karma = Post.objects.filter(id=post.id).first().post_karma
+            return JsonResponse({'result': str(updated_post_karma)})
         else:
-            post.karma_count = F('karma_count') + 1
-        post.save()
-        updated_post_karma = Post.objects.filter(id=post.id).first().post_karma
-        return JsonResponse({'result': str(updated_post_karma)})
+            already_liked.delete()
+            if post.karma_count >= 0:
+                post.karma_count = F('karma_count') - 1
+            else:
+                post.karma_count = F('karma_count') + 1
+            post.save()
+            updated_post_karma = Post.objects.filter(id=post.id).first().post_karma
+            return JsonResponse({'result': str(updated_post_karma)})
 
 
 def perform_comment_karma_update(post, comment, user, karma):
@@ -223,33 +228,29 @@ class PostCreateView(CreateView, SuccessMessageMixin, LoginRequiredDispatchMixin
     success_url = reverse_lazy('post:users_posts')
     success_message = 'пост создан'
 
-
     def form_valid(self, form):
         messages.add_message(self.request, messages.SUCCESS, self.success_message)
         tags = form.cleaned_data['tags_str']  # строка с тегами из формы
+        if tags:
+            tmp_tags = str(tags).split(',') # распарсил теги
+            for key, el in enumerate(tmp_tags):
+                tmp_tags[key] = el.strip() # убрал пробелы
 
-        tmp_tags = str(tags).split(',') # распарсил теги
-        for key, el in enumerate(tmp_tags):
-            tmp_tags[key] = el.strip() # убрал пробелы
+            new_tags = [] # массив куда складываются id тэгов для записи в поле тэг поста
 
-        new_tags = [] # массив куда складываются id тэгов для записи в поле тэг поста
+            if form.is_valid():
+                f = form.save()
+            for tmp_tag in tmp_tags:
+                # проевряем есть тэг в таблице тэгов
+                tag_exists = tmp_tag is not None and Tags.objects.filter(tag=tmp_tag).exists()
+                if not tag_exists:
+                    # # создаем новый тэг в таблицу тэгов
+                    # tag_id = Tags.objects.create(tag=tmp_tag)
+                    # добавляем тэг в массив для поста
+                    form.instance.tags.create(tag=tmp_tag)
 
-        if form.is_valid():
-            f = form.save()
-        for tmp_tag in tmp_tags:
-            # проевряем есть тэг в таблице тэгов
-            tag_exists = tmp_tag is not None and Tags.objects.filter(tag=tmp_tag).exists()
-
-            if not tag_exists:
-                # создаем новый тэг в таблицу тэгов
-                tag_id = Tags.objects.create(tag=tmp_tag)
-                # добавляем тэг в массив для поста
-                form.instance.tags.create(tag=tag_id.tag)
-
-            else:
-                form.instance.tags.add(Tags.objects.filter(tag=tmp_tag).first().tag)
-
-        f.save()
+                else:
+                    form.instance.tags.add(Tags.objects.filter(tag=tmp_tag).first())
 
         return super().form_valid(form)
 
@@ -258,6 +259,12 @@ class PostCreateView(CreateView, SuccessMessageMixin, LoginRequiredDispatchMixin
         context['form']['user'].initial = self.request.user
         context['title'] = f'Создание поста'
         return context
+
+    def get(self, request, *args, **kwargs):
+        if self.request.user.banned in (HubUser.BANNED_FOREVER, HubUser.BANNED_FOR_TIME):
+            messages.add_message(self.request, messages.SUCCESS, 'Забаненный пользователь не может создавать посты')
+            return HttpResponseRedirect(reverse('hub:main'))
+        return super(PostCreateView, self).get(request, *args, **kwargs)
 
 
 class CommentUserlist(ListView):
@@ -352,34 +359,30 @@ class PostUpdateView(UpdateView, LoginRequiredDispatchMixin):
         return HttpResponseRedirect(reverse('post:post', kwargs={'pk': post.id}))
 
     def form_valid(self, form):
-        print(f'ya v form_valid')
         messages.add_message(self.request, messages.SUCCESS, self.success_message)
         tags = form.cleaned_data['tags_str']  # строка с тегами из формы
+        self.object.tags.clear()
+        self.object.save()
+        if tags:
+            tmp_tags = str(tags).split(',')  # распарсил теги
+            for key, el in enumerate(tmp_tags):
+                tmp_tags[key] = el.strip()  # убрал пробелы
 
-        tmp_tags = str(tags).split(',')  # распарсил теги
-        for key, el in enumerate(tmp_tags):
-            tmp_tags[key] = el.strip()  # убрал пробелы
+            new_tags = []  # массив куда складываются id тэгов для записи в поле тэг поста
 
-        new_tags = []  # массив куда складываются id тэгов для записи в поле тэг поста
+            for tmp_tag in tmp_tags:
+                # проевряем есть тэг в таблице тэгов
+                tag_exists = tmp_tag is not None and Tags.objects.filter(tag=tmp_tag).exists()
+                if not tag_exists:
+                    # # создаем новый тэг в таблицу тэгов
+                    # tag_id = Tags.objects.create(tag=tmp_tag)
+                    # добавляем тэг в массив для поста
+                    form.instance.tags.create(tag=tmp_tag)
 
-        if form.is_valid():
-            post = get_object_or_404(Post, id=self.kwargs.get('pk', ''))
-            post.tags.clear()
-            f = form.save()
-        for tmp_tag in tmp_tags:
-            # проевряем есть тэг в таблице тэгов
-            tag_exists = tmp_tag is not None and Tags.objects.filter(tag=tmp_tag).exists()
+                else:
 
-            if not tag_exists:
-                # создаем новый тэг в таблицу тэгов
-                tag_id = Tags.objects.create(tag=tmp_tag)
-                # добавляем тэг в массив для поста
-                form.instance.tags.create(tag=tag_id.tag)
+                    form.instance.tags.add(Tags.objects.filter(tag=tmp_tag).first())
 
-            else:
-                form.instance.tags.add(Tags.objects.filter(tag=tmp_tag).first().id)
-
-        f.save()
         return super().form_valid(form)
 
 
@@ -403,6 +406,7 @@ class PostModerateView(UpdateView, LoginRequiredDispatchMixin):
             form.instance.moderated = True
             form.instance.moderated_at = datetime.now(pytz.timezone(settings.TIME_ZONE))
             form.instance.save()
+
         return super().form_valid(form)
 
 

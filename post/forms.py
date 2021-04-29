@@ -76,10 +76,19 @@ class PostModeratorEditForm(forms.ModelForm):
 
     content = forms.CharField(label='Содержание', widget=CKEditorUploadingWidget(config_name='default'))
     status = forms.ChoiceField(choices=STATUSES, label='Статус', initial=STATUS_ON_MODERATE)
+    tags_str = forms.CharField(
+        label='Тэги поста:',
+        max_length=200,
+        required=False,
+        widget=forms.TextInput(
+            attrs={'size': 67, 'placeholder': 'Тэги введите через запятую', }
+        )
+    )
 
     class Meta:
         model = Post
-        exclude = ('moderated', 'moderated_at')
+        exclude = ('tags', 'moderated', 'moderated_at', )
+        fields = ('name', 'hub_category', 'tags_str', 'status', 'user', 'moderate_desc', 'karma_count', 'content')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

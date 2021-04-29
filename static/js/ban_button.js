@@ -1,8 +1,7 @@
 window.onload = function () {
-    let message = $('.message');
     let ban_time = $('#id_ban_time');
-
-    $('.link').click(function () {
+    let link = $('.link');
+    link.click(function () {
         let target = event.target;
         let link_num = parseInt(target.id.replace('link-', ''));
         if (target.text == 'забанить') {
@@ -11,10 +10,8 @@ window.onload = function () {
         } else {
             let button_id = 'submit-' + link_num;
             $('#' + button_id).prop('style', 'display:inline');
-        }});
+        }
 
-    $('.close').click(function () {
-        message.prop('style', 'display:none');
 
         // window.alert(form_id);
         // window.alert($(this).attr('id'));

@@ -2,15 +2,17 @@
 {% load static %}
 {% block content %}
     {% include 'post/includes/menu.html' %}
-    <div class="posts">
+
 
                                 {% include 'post/includes/post_empty_status.html' %}
 
         {% for post in posts %}
-            <div class="card" >
+            <div class="card mt-3 mb-5" >
+
+                <div class="card-body">
 
                 <img src="https://media.istockphoto.com/vectors/thin-line-design-concept-for-project-website-banner-vector-id510855044"
-                     alt="preview">
+                     class="card-img-top" alt="...">
                 <div class="post__container">
                     {% include 'post/includes/post_moderate_status.html' %}
                     <div class="post__user">Пользователь: <span>{{ post.user }}</span></div>
@@ -27,9 +29,9 @@
 
                     </div>
 
-                    <div class="post__button__read">
-                        <a href="{% url 'post:post' post.id %}">
-                            <button>Читать далее...</button>
+
+                        <a href="{% url 'post:post' post.id %}" class="btn btn-primary">
+                            Читать далее...
                         </a>
 
                         {% if post.status == 'unpublished' %}
@@ -52,7 +54,7 @@
 
 
 
-                    </div>
+
 
                     <div class="post__statistic">
                         <div class="post__karma"><i class="fa fa-bar-chart" aria-hidden="true"></i><span
@@ -61,34 +63,8 @@
                     </div>
                 </div>
             </div>
-        {% endfor %}
+
     </div>
-    {% if posts %}
-    <nav aria-label="Page navigation example" class="mt-3">
-                        <ul class="pagination">
-                            <li class="page-item">
-                                {% if page_obj.has_previous %}
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}"
-                                       aria-label="Previous" style="color: black">
-                                        <span aria-hidden="true">&laquo;</span>
-                                        <span class="sr-only">Previous</span>
-                                    </a>
-                                {% endif %}
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#"  style="color: black">Страница {{ page_obj.number }}
-                                из {{ page_obj.paginator.num_pages }}
-                            </a></li>
-                            <li class="page-item">
-                                {% if page_obj.has_next %}
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}"
-                                       aria-label="Next"  style="color: black">
-                                        <span aria-hidden="true">&raquo;</span>
-                                        <span class="sr-only">Next</span>
-                                    </a>
-                                {% endif %}
-                            </li>
-                        </ul>
-                    </nav>
-    {% endif %}
+    {% endfor %}
 
 {% endblock %}

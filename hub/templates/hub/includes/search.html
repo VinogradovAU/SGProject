@@ -1,0 +1,34 @@
+
+<form>
+                <div class="row">
+
+                    <div class="col-3">
+                        <div class="row">
+                            <div class="col-4">
+                                <label>дней</label>
+                            </div>
+                            <div class="col-8">
+                                <input type="number" class="form-control" name="days" value="{{ request.GET.days|default:20 }}" placeholder="за сколько дней" />
+
+                                <select class="form-control" name="msg_type">
+                                    <option value="all">Все</option>
+                                    <option {% if request.GET.msg_type == 'date_up' %}selected{% endif %} value="date_up">по дате - сначала новые</option>
+                                    <option {% if request.GET.msg_type == 'date_down' %}selected{% endif %} value="date_down">по дате - сначала старые</option>
+                                    <option {% if request.GET.msg_type == 'karma_up' %}selected{% endif %} value="karma_up">по карме - сначала больше</option>
+                                    <option {% if request.GET.msg_type == 'karma_down' %}selected{% endif %} value="karma_down">по карме - сначала меньше</option>
+                                    <option {% if request.GET.msg_type == 'comments_up' %}selected{% endif %} value="comments_up">горячие посты - горячее <i class="fa fa-sort-down"></i></option>
+                                    <option {% if request.GET.msg_type == 'comments_down' %}selected{% endif %} value="comments_down">горячие посты - холоднее <i class="fa fa-sort-up"></i></option>
+                                </select>
+
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Отфильтровать <i class="fa fa-filter"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </form>
+
+

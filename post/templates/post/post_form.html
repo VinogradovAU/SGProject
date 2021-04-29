@@ -1,15 +1,15 @@
 {% extends 'hub/base.html' %}
 {% load static %}
 {% block content %}
-    <div class="posts">
+    <div class="card mt-3 mb-5" >
 
-        <div class="card">
+        <div class="card-body">
 
             <img src="https://media.istockphoto.com/vectors/thin-line-design-concept-for-project-website-banner-vector-id510855044"
-                 alt="preview">
+                 class="card-img-top" alt="...">
             <div class="post__container">
                     <form id="form-horizontal m-t-30" method="post" enctype="multipart/form-data">
-                        <p style="color: darkorange">Пост {{ form.instance.get_status_display }}</p>
+                        <p style="color: darkorange">Пост - {{ form.instance.get_status_display }}</p>
                         {% if user.is_staff and form.instance.user is not None %}
                         <p style="color: darkorange">автор <a href="#" style="color: black">{{ form.instance.user }}</a></p>
                         {% endif %}
